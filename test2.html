@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>N-Body Simulation</title>
+  <style>
+    canvas { background: black; display: block; margin: auto; }
+    #controls {
+      text-align: center;
+      color: black;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+<canvas id="simulationCanvas" width="800" height="600"></canvas>
+
+<div id="controls">
+  <label>Mass: <input type="number" id="mass" value="50"></label>
+  <label>X: <input type="number" id="x" value="400"></label>
+  <label>Y: <input type="number" id="y" value="100"></label>
+  <label>VX: <input type="number" id="vx" value="0"></label>
+  <label>VY: <input type="number" id="vy" value="2"></label>
+  <button onclick="addBody()">Add Body</button>
+</div>
+
+<script>
+  const canvas = document.getElementById('simulationCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const G = 6.67430e-2; // Increased gravity for better visualization
+
+  class Body {
+    constructor(mass, x, y, vx, vy) {
+      this.mass = mass;
+      this.x = x;
+      this.y = y;
+      this.vx = vx;
+      this.vy = vy;
+    }
+
+    updatePosition(dt) {
+      this.x += this.vx * dt;
+      this.y += this.vy * dt;
+    }
+
+    updateVelocity(ax, ay, dt) {
+      this.vx += ax * dt;
+      this.vy += ay * dt;
+    }
+
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, Math.max(3, Math.log(this.mass)), 0, 2 * Math.PI);
+      ctx.fillStyle = 'white';
+      ctx.fill();
+    }
+  }
+
+  let bodies = [
+    new Body(5000, 400, 300, 0, 0),  // Central body (Sun)
+    new Body(20, 500, 300, 0, 1.5),  // Orbiting body
+    new Body(10, 300, 300, 0, -2),   // Another orbiting body
+  ];
+
+  function computeForces() {
+    const forces = bodies.map(() => ({ ax: 0, ay: 0 }));
+    for (let i = 0; i < bodies.length; i++) {
+      for (let j = i + 1; j < bodies.length; j++) {
+        const dx = bodies[j].x - bodies[i].x;
+        const dy = bodies[j].y - bodies[i].y;
+        const distSq = dx * dx + dy * dy;
+        const dist = Math.sqrt(distSq) + 0.1; // Avoid division by zero
+        const force = (G * bodies[i].mass * bodies[j].mass) / (distSq);
+
+        const ax = (force * dx / dist) / bodies[i].mass;
+        const ay = (force * dy / dist) / bodies[i].mass;
+        const bx = (force * -dx / dist) / bodies[j].mass;
+        const by = (force * -dy / dist) / bodies[j].mass;
+
+        forces[i].ax += ax;
+        forces[i].ay += ay;
+        forces[j].ax += bx;
+        forces[j].ay += by;
+      }
+    }
+    return forces;
+  }
+
+  function update(dt) {
+    const forces = computeForces();
+    for (let i = 0; i < bodies.length; i++) {
+      bodies[i].updateVelocity(forces[i].ax, forces[i].ay, dt);
+      bodies[i].updatePosition(dt);
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    bodies.forEach(body => body.draw());
+  }
+
+  function loop() {
+    update(0.5);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  function addBody() {
+    const mass = parseFloat(document.getElementById('mass').value);
+    const x = parseFloat(document.getElementById('x').value);
+    const y = parseFloat(document.getElementById('y').value);
+    const vx = parseFloat(document.getElementById('vx').value);
+    const vy = parseFloat(document.getElementById('vy').value);
+
+    if (!isNaN(mass) && !isNaN(x) && !isNaN(y) && !isNaN(vx) && !isNaN(vy)) {
+      bodies.push(new Body(mass, x, y, vx, vy));
+    }
+  }
+
+  function removeBody(x, y) {
+    bodies = bodies.filter(body => {
+      const dx = body.x - x;
+      const dy = body.y - y;
+      return Math.sqrt(dx * dx + dy * dy) > 10; // Remove if clicked near body
+    });
+  }
+
+  canvas.addEventListener('click', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+    removeBody(mouseX, mouseY);
+  });
+
+  loop();
+</script>
+</body>
+</html>

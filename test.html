@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>N-Body Simulation</title>
+  <style>
+    canvas { background: #000; display: block; margin: 0 auto; }
+  </style>
+</head>
+<body>
+<canvas id="simulationCanvas" width="800" height="600"></canvas>
+<script>
+  const canvas = document.getElementById('simulationCanvas');
+  const ctx = canvas.getContext('2d');
+  const G = 6.67430e-11; // Gravitational constant
+
+  class Body {
+    constructor(mass, x, y, vx, vy) {
+      this.mass = mass;
+      this.x = x;
+      this.y = y;
+      this.vx = vx;
+      this.vy = vy;
+    }
+
+    updatePosition(dt) {
+      this.x += this.vx * dt;
+      this.y += this.vy * dt;
+    }
+
+    updateVelocity(ax, ay, dt) {
+      this.vx += ax * dt;
+      this.vy += ay * dt;
+    }
+
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, Math.log(this.mass), 0, 2 * Math.PI);
+      ctx.fillStyle = 'white';
+      ctx.fill();
+    }
+  }
+
+  const bodies = [
+    new Body(1e12, 400, 300, 0, 0),
+    new Body(1e10, 500, 100, 0, 1),
+    new Body(1e10, 300, 300, 0, -1)
+  ];
+
+  function computeForces() {
+    const forces = bodies.map(() => ({ ax: 0, ay: 0 }));
+    for (let i = 0; i < bodies.length; i++) {
+      for (let j = i + 1; j < bodies.length; j++) {
+        const dx = bodies[j].x - bodies[i].x;
+        const dy = bodies[j].y - bodies[i].y;
+        const distSq = dx * dx + dy * dy;
+        const dist = Math.sqrt(distSq);
+        const force = (G * bodies[i].mass * bodies[j].mass) / distSq;
+        const ax = force * dx / dist / bodies[i].mass;
+        const ay = force * dy / dist / bodies[i].mass;
+        forces[i].ax += ax;
+        forces[i].ay += ay;
+        forces[j].ax -= ax;
+        forces[j].ay -= ay;
+      }
+    }
+    return forces;
+  }
+
+  function update(dt) {
+    const forces = computeForces();
+    for (let i = 0; i < bodies.length; i++) {
+      bodies[i].updateVelocity(forces[i].ax, forces[i].ay, dt);
+      bodies[i].updatePosition(dt);
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    bodies.forEach(body => body.draw());
+  }
+
+  function loop() {
+    update(1);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  loop();
+</script>
+</body>
+</html>

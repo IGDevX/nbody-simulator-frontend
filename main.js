@@ -1,15 +1,15 @@
-const canvas = document.getElementById("nbodyCanvas");
-const ctx = canvas.getContext("2d");
+const canvas = document.getElementById('simulationCanvas');
+
+const ctx = canvas.getContext('2d');
 
 const socket = new WebSocket("ws://localhost:8080/simulation");
 
 socket.onopen = function(event) {
     console.log("WebSocket connection established.");
-    socket.send("Hello, Server!"); // Sending a message to the backend
 };
 
 socket.onmessage = (event) => {
-    let bodies = JSON.parse(event.data);
+    bodies = JSON.parse(event.data);
     draw(bodies);
 };
 
@@ -21,29 +21,52 @@ socket.onclose = function(event) {
     console.log("WebSocket connection closed.");
 };
 
-// Define a smaller scale factor to make bodies fit within canvas size
-const SCALE_FACTOR = 1e-11;  // Smaller scale for better visibility
-const CENTER_X = canvas.width / 2;
-const CENTER_Y = canvas.height / 2;
-
-function draw(bodies) {
+function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    bodies.forEach(body => {
-        // Transform the position using a smaller scale factor
-        const x = CENTER_X + body.position.x * SCALE_FACTOR;
-        const y = CENTER_Y + body.position.y * SCALE_FACTOR;
+    bodies.forEach(body =>
+        {
+            console.log(body);
+            drawBody(body);
+        }
+    );
+}
 
-        // Log the transformed positions for debugging
-        console.log("Transformed X:", x, "Transformed Y:", y);
+function drawBody(body) {
+    ctx.beginPath();
+    ctx.arc(body.x, body.y, Math.max(3, Math.log(body.mass)), 0, 2 * Math.PI);
+    ctx.fillStyle = 'white';
+    ctx.fill();
+}
 
-        // Clamp the coordinates inside the canvas bounds
-        const clampedX = Math.max(0, Math.min(canvas.width, x));
-        const clampedY = Math.max(0, Math.min(canvas.height, y));
+function addBody() {
+    const mass = parseFloat(document.getElementById('mass').value);
+    const x = parseFloat(document.getElementById('x').value);
+    const y = parseFloat(document.getElementById('y').value);
+    const vx = parseFloat(document.getElementById('vx').value);
+    const vy = parseFloat(document.getElementById('vy').value);
 
-        // Draw the body on the canvas
-        ctx.beginPath();
-        ctx.arc(clampedX, clampedY, 5, 0, Math.PI * 2);
-        ctx.fillStyle = "black";
-        ctx.fill();
+    if (!isNaN(mass) && !isNaN(x) && !isNaN(y) && !isNaN(vx) && !isNaN(vy)) {
+        socket.send(JSON.stringify({
+            mass: mass,
+            x: x,
+            y: y,
+            vx: vx,
+            vy: vy,
+        }));
+    }
+}
+
+function removeBody(x, y) {
+    bodies = bodies.filter(body => {
+        const dx = body.x - x;
+        const dy = body.y - y;
+        return Math.sqrt(dx * dx + dy * dy) > 10; // Remove if clicked near body
     });
 }
+
+canvas.addEventListener('click', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+    removeBody(mouseX, mouseY);
+});
