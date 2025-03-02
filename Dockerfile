@@ -14,4 +14,4 @@ RUN apk add --no-cache sed
 EXPOSE 80
 
 # Replace WebSocket URL at runtime and start Nginx
-CMD sed -i "s|ws://localhost:8080/simulation|${WEBSOCKET_URL}/simulation|g" /usr/share/nginx/html/*.js && nginx -g "daemon off;"
+CMD sed -i "s|ws://localhost:8080/simulation|ws://${WEBSOCKET_URL}/simulation|g" /usr/share/nginx/html/*.js && nginx -g "daemon off;"
