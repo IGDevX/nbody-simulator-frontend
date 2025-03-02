@@ -8,7 +8,7 @@ WORKDIR /usr/share/nginx/html
 COPY . /usr/share/nginx/html
 
 # Replace WebSocket URL dynamically
-RUN sed -i 's|localhost:8080|'"${WEBSOCKET_URL}"'|g' /usr/share/nginx/html/*.js
+RUN sed -i 's|ws://localhost:8080/simulation|'ws://"${WEBSOCKET_URL}"/simulation'|g' /usr/share/nginx/html/*.js
 
 # Expose port 80
 EXPOSE 80
