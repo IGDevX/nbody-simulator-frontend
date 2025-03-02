@@ -1,17 +1,17 @@
-# Use an official Nginx image as the base image
+# Use an official Nginx image
 FROM nginx:alpine
 
-# Set the working directory to /usr/share/nginx/html
+# Set working directory
 WORKDIR /usr/share/nginx/html
 
-# Copy website files to the container
+# Copy website files
 COPY . /usr/share/nginx/html
 
-# Replace WebSocket URL dynamically
-RUN sed -i 's|ws://localhost:8080/simulation|'ws://"${WEBSOCKET_URL}"/simulation'|g' /usr/share/nginx/html/*.js
+# Install sed for text replacement
+RUN apk add --no-cache sed
 
 # Expose port 80
 EXPOSE 80
 
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Replace WebSocket URL at runtime and start Nginx
+CMD sed -i "s|ws://localhost:8080/simulation|${WEBSOCKET_URL}/simulation|g" /usr/share/nginx/html/*.js && nginx -g "daemon off;"
