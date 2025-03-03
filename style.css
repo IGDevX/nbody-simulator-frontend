@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(circle, #000010, #000022, #000033);
+    font-family: 'Orbitron', sans-serif;
+    color: #0ff;
+    text-align: center;
+}
+
+h1 {
+    font-size: 28px;
+    color: #0ff;
+    text-shadow: 0 0 10px #0ff, 0 0 20px #00f;
+    margin-top: 20px;
+}
+
+canvas {
+    display: block;
+    margin: 20px auto;
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+#controls {
+    background: rgba(0, 0, 32, 0.8);
+    border: 2px solid rgba(0, 255, 255, 0.5);
+    border-radius: 10px;
+    padding: 15px;
+    display: inline-block;
+    margin-top: 20px;
+    margin-right: 50px;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    width: 320px;
+    text-align: center;
+}
+
+#row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+label {
+    font-size: 14px;
+    color: #0ff;
+}
+
+input {
+    background: black;
+    border: 1px solid rgba(0, 255, 255, 0.5);
+    color: #0ff;
+    padding: 5px;
+    width: 80px;
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+}
+
+input:focus {
+    outline: none;
+    border-color: #ff0;
+    box-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+}
+
+button {
+    background: black;
+    border: 2px solid #0ff;
+    color: #0ff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    transition: all 0.3s ease-in-out;
+    width: 100%;
+}
+
+button:hover {
+    background: #0ff;
+    color: black;
+    box-shadow: 0 0 20px #0ff;
+    transform: scale(1.05);
+}

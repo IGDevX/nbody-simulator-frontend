@@ -25,7 +25,6 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     bodies.forEach(body =>
         {
-            console.log(body);
             drawBody(body);
         }
     );
@@ -47,6 +46,7 @@ function addBody() {
 
     if (!isNaN(mass) && !isNaN(x) && !isNaN(y) && !isNaN(vx) && !isNaN(vy)) {
         socket.send(JSON.stringify({
+            id: generateUniqueId(),
             mass: mass,
             x: x,
             y: y,
@@ -56,17 +56,25 @@ function addBody() {
     }
 }
 
-function removeBody(x, y) {
-    bodies = bodies.filter(body => {
-        const dx = body.x - x;
-        const dy = body.y - y;
-        return Math.sqrt(dx * dx + dy * dy) > 10; // Remove if clicked near body
-    });
+function generateUniqueId() {
+    return 'body-' + Math.random().toString(36).substr(2, 9); // Generate a random ID
+}
+
+function removeBody(id) {
+    bodies = bodies.filter(body => body.id !== id);
+    socket.send(JSON.stringify({ remove: id }));
 }
 
 canvas.addEventListener('click', (event) => {
     const rect = canvas.getBoundingClientRect();
     const mouseX = event.clientX - rect.left;
     const mouseY = event.clientY - rect.top;
-    removeBody(mouseX, mouseY);
+
+    bodies.forEach(body => {
+        const dx = body.x - mouseX;
+        const dy = body.y - mouseY;
+        if (Math.sqrt(dx * dx + dy * dy) < Math.max(3, Math.log(body.mass))) {
+            removeBody(body.id);
+        }
+    });
 });

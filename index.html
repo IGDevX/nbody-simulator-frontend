@@ -2,26 +2,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>N-Body Simulation</title>
-    <style>
-        canvas { background: black; display: block; margin: auto; }
-        #controls {
-            text-align: center;
-            color: black;
-            margin-top: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<canvas id="simulationCanvas" width="800" height="600"></canvas>
-<div id="controls">
-    <label>Mass: <input type="number" id="mass" value="50"></label>
-    <label>X: <input type="number" id="x" value="400"></label>
-    <label>Y: <input type="number" id="y" value="100"></label>
-    <label>VX: <input type="number" id="vx" value="0"></label>
-    <label>VY: <input type="number" id="vy" value="2"></label>
-    <button onclick="addBody()">Add Body</button>
+<h1>N-Body Simulation</h1>
+<div id="row">
+    <canvas id="simulationCanvas" width="800" height="600"></canvas>
+
+    <div id="controls">
+        <div class="input-group">
+            <label>Mass:</label>
+            <input type="number" id="mass" value="50">
+        </div>
+        <div class="input-group">
+            <label>X:</label>
+            <input type="number" id="x" value="400">
+        </div>
+        <div class="input-group">
+            <label>Y:</label>
+            <input type="number" id="y" value="100">
+        </div>
+        <div class="input-group">
+            <label>VX:</label>
+            <input type="number" id="vx" value="0">
+        </div>
+        <div class="input-group">
+            <label>VY:</label>
+            <input type="number" id="vy" value="2">
+        </div>
+        <button onclick="addBody()">Add Body</button>
+    </div>
 </div>
+
 <script src="main.js"></script>
 </body>
 </html>
